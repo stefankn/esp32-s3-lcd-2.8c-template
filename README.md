@@ -26,9 +26,9 @@ A starter template for the [Waveshare ESP32-S3-LCD-2.8C](https://docs.waveshare.
 
 ### Arduino IDE Setup
 
-1. Install the **ESP32 Arduino core** (Espressif Systems) via Boards Manager
-2. Select board: **ESP32S3 Dev Module** (or the Waveshare-specific entry if available)
-3. Enable **PSRAM**: *Tools → PSRAM → OPI PSRAM*
+1. Install the **ESP32** (Espressif Systems) via Boards Manager
+2. Select board: **Waveshare ESP32-S3-Touch-LCD-2.8** (or the Waveshare-specific entry if available)
+3. Enable **PSRAM**: *Tools → PSRAM → Enabled*
 4. Install library via Library Manager:
    - **LVGL** version **8.3.9**
 
