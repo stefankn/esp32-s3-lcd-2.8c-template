@@ -24,23 +24,33 @@ A starter template for the [Waveshare ESP32-S3-LCD-2.8C](https://www.waveshare.c
 
 ## Requirements
 
-### Arduino IDE Setup
+### PlatformIO Setup
 
-1. Install the **ESP32 Arduino core** (Espressif Systems) via Boards Manager
-2. Select board: **ESP32S3 Dev Module** (or the Waveshare-specific entry if available)
-3. Enable **PSRAM**: *Tools → PSRAM → OPI PSRAM*
-4. Install library via Library Manager:
-   - **LVGL** version **8.3.9**
+1. Install the [PlatformIO CLI](https://docs.platformio.org/en/latest/core/installation/index.html)
+2. Copy `platformio.ini.example` to `platformio.ini`:
+   ```sh
+   cp platformio.ini.example platformio.ini
+   ```
+3. (Optional) Uncomment and set `upload_port` / `monitor_port` in `platformio.ini` if PlatformIO does not auto-detect your device
+
+Dependencies are fetched automatically by PlatformIO — no manual library installation needed.
 
 ## Project Structure
 
 ```
-esp32-s3-lcd-2.8c-template.ino   Entry point — setup() / loop()
-Display_ST7701.cpp / .h          ST7701 SPI init, RGB panel driver, backlight PWM
-LVGL_Driver.cpp / .h             LVGL init, frame buffers, flush callback, tick timer
-I2C_Driver.cpp / .h              I2C bus driver (SDA=15, SCL=7)
-TCA9554PWR.cpp / .h              TCA9554 8-bit GPIO expander driver
-lv_conf.h                        LVGL compile-time configuration
+platformio.ini.example           PlatformIO config template (copy to platformio.ini)
+src/
+  esp32-s3-lcd-2.8c-template.ino  Entry point — setup() / loop()
+  Display_ST7701.cpp               ST7701 SPI init, RGB panel driver, backlight PWM
+  LVGL_Driver.cpp                  LVGL init, frame buffers, flush callback, tick timer
+  I2C_Driver.cpp                   I2C bus driver (SDA=15, SCL=7)
+  TCA9554PWR.cpp                   TCA9554 8-bit GPIO expander driver
+include/
+  Display_ST7701.h
+  LVGL_Driver.h
+  I2C_Driver.h
+  TCA9554PWR.h
+  lv_conf.h                        LVGL compile-time configuration
 ```
 
 ## Pin Reference
@@ -78,10 +88,13 @@ lv_conf.h                        LVGL compile-time configuration
 ## Getting Started
 
 1. Clone or download this repository
-2. Open `esp32-s3-lcd-2.8c-template.ino` in Arduino IDE
-3. Configure the board settings as described above
-4. Flash to your board
-5. The display should show a black screen with a white "Hello" label
+2. Copy `platformio.ini.example` to `platformio.ini`
+3. Build and flash: `pio run -t upload`
+4. The display should show a black screen with a white "Hello" label
+
+If you encounter build issues, clean the build directory with `pio run -t clean` and retry.
+
+Monitor serial output with `pio device monitor --baud 115200`.
 
 ## Adding Your UI
 

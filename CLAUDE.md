@@ -2,25 +2,38 @@
 
 ## Project Overview
 
-Arduino IDE sketch that serves as a starter template for the **Waveshare ESP32-S3-LCD-2.8C** board. Drives a 480×480 ST7701 RGB LCD using the ESP32-S3's built-in RGB LCD peripheral, with LVGL 8.3.9 for the UI layer.
+PlatformIO project that serves as a starter template for the **Waveshare ESP32-S3-LCD-2.8C** board. Drives a 480×480 ST7701 RGB LCD using the ESP32-S3's built-in RGB LCD peripheral, with LVGL 8.3.9 for the UI layer.
 
 ## Build System
 
-- **IDE**: Arduino IDE (entry point is the `.ino` file)
-- **Board**: ESP32-S3 (select the appropriate Waveshare or generic ESP32-S3 board package)
-- **Required Libraries** (install via Arduino Library Manager):
-  - LVGL 8.3.9
-- **PSRAM**: Must be enabled in Arduino board settings — frame buffers are allocated from PSRAM
+- **Build tool**: PlatformIO CLI
+- **Framework**: Arduino (entry point is `src/esp32-s3-lcd-2.8c-template.ino`)
+- **Config**: Copy `platformio.ini.example` to `platformio.ini` before building
+- **Dependencies**: Managed by PlatformIO (`lvgl/lvgl@^8.3.0`)
+- **PSRAM**: Enabled via `board_build.arduino.memory_type = qio_opi` in `platformio.ini`
+
+### Common Commands
+
+- Build & flash: `pio run -t upload`
+- Clean build: `pio run -t clean`
+- Serial monitor: `pio device monitor --baud 115200`
 
 ## Project Structure
 
 ```
-esp32-s3-lcd-2.8c-template.ino   Main sketch (setup/loop)
-Display_ST7701.cpp/h             ST7701 init over SPI + RGB panel driver + backlight PWM
-LVGL_Driver.cpp/h                LVGL init, frame buffers, flush callback, tick timer
-I2C_Driver.cpp/h                 I2C bus (SDA=15, SCL=7)
-TCA9554PWR.cpp/h                 TCA9554 GPIO expander at I2C 0x20
-lv_conf.h                        LVGL compile-time configuration
+platformio.ini.example           PlatformIO config template (copy to platformio.ini)
+src/
+  esp32-s3-lcd-2.8c-template.ino  Main sketch (setup/loop)
+  Display_ST7701.cpp               ST7701 init over SPI + RGB panel driver + backlight PWM
+  LVGL_Driver.cpp                  LVGL init, frame buffers, flush callback, tick timer
+  I2C_Driver.cpp                   I2C bus (SDA=15, SCL=7)
+  TCA9554PWR.cpp                   TCA9554 GPIO expander at I2C 0x20
+include/
+  Display_ST7701.h
+  LVGL_Driver.h
+  I2C_Driver.h
+  TCA9554PWR.h
+  lv_conf.h                        LVGL compile-time configuration
 ```
 
 ## Key Hardware Details
