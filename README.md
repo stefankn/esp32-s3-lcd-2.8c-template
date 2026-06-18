@@ -1,6 +1,6 @@
 # ESP32-S3-LCD-2.8C Template
 
-A starter template for the [Waveshare ESP32-S3-LCD-2.8C]([https://www.waveshare.com/esp32-s3-lcd-2.8c.htm](https://docs.waveshare.com/ESP32-S3-LCD-2.8C)) development board. Brings up the 480×480 ST7701 RGB display and initialises the LVGL 8 graphics library, ready for your application.
+A starter template for the [Waveshare ESP32-S3-LCD-2.8C](https://docs.waveshare.com/ESP32-S3-LCD-2.8C) development board. Brings up the 480×480 ST7701 RGB display and initialises the LVGL 8 graphics library, ready for your application.
 
 ## Hardware
 
