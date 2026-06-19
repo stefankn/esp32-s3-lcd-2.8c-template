@@ -96,6 +96,16 @@ If you encounter build issues, clean the build directory with `pio run -t clean`
 
 Monitor serial output with `pio device monitor --baud 115200`.
 
+### LSP / Editor Integration
+
+Generate a `compile_commands.json` file so your editor's C/C++ language server (clangd, ccls, etc.) can resolve includes, macros, and flags correctly:
+
+```sh
+pio run -t compiledb
+```
+
+This writes `compile_commands.json` to the project root. Point your LSP at it (clangd picks it up automatically; for other servers set the `compilationDatabasePath` option). Re-run the command after adding or removing source files, or after changing build flags in `platformio.ini`.
+
 ## Adding Your UI
 
 Place your LVGL widget code in `setup()` after `Lvgl_Init()`:

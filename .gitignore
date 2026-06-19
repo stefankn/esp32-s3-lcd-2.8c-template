@@ -1,3 +1,4 @@
 .DS_Store
 platformio.ini
 .pio/
+compile_commands.json
