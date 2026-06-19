@@ -16,8 +16,8 @@ A starter template for the [Waveshare ESP32-S3-LCD-2.8C](https://www.waveshare.c
 ## Features
 
 - Full ST7701 initialisation sequence over SPI
-- ESP32-S3 RGB LCD peripheral configured for 480×480 @ 30 MHz pixel clock
-- LVGL 8.3.9 integrated with dual PSRAM frame buffers
+- ESP32-S3 RGB LCD peripheral configured for 480×480 @ 18 MHz pixel clock
+- LVGL 8.3.9 integrated with dual PSRAM frame buffers, vsync-synchronised flush
 - Backlight PWM control (`Set_Backlight(0–100)`)
 - TCA9554 GPIO expander driver for display reset/CS/backlight enable
 - WiFi and Bluetooth scan utilities (`Wifi_Scan()` / `Bluetooth_Scan()`) — run as background FreeRTOS tasks on core 0
@@ -143,20 +143,37 @@ Keep large allocations in PSRAM using `heap_caps_malloc(size, MALLOC_CAP_SPIRAM)
 
 ## Wireless
 
-`Wifi_Scan()` and `Bluetooth_Scan()` are independent — call either or both after `Lvgl_Init()`. Each spawns a FreeRTOS task on core 0 and returns immediately, so the display loop on core 1 is unaffected. Results land in `WIFI_NUM` and `BLE_NUM` and are logged to serial.
+All three functions spawn a FreeRTOS task on core 0 and return immediately, so the display loop on core 1 is unaffected. Call them after `Lvgl_Init()`.
 
 ```cpp
 #include "Wireless.h"
 
 // In setup(), after Lvgl_Init():
-Wifi_Scan();       // logs SSIDs and RSSI, stores count in WIFI_NUM
-Bluetooth_Scan();  // 5-second BLE scan, stores count in BLE_NUM
+Wifi_Scan();                          // logs SSIDs and RSSI, stores count in WIFI_NUM
+Wifi_Connect("ssid", "password");     // connects to a network; sets WIFI_Connection on success
+Bluetooth_Scan();                     // 5-second BLE scan, stores count in BLE_NUM
 ```
+
+### WiFi credentials
+
+Copy `include/secrets.h.example` to `include/secrets.h` and fill in your credentials:
+
+```sh
+cp include/secrets.h.example include/secrets.h
+```
+
+```cpp
+#define WIFI_SSID     "your-network-name"
+#define WIFI_PASSWORD "your-password"
+```
+
+`secrets.h` is gitignored and must never be committed. When present, `main.cpp` automatically calls `Wifi_Connect(WIFI_SSID, WIFI_PASSWORD)` during `setup()`.
 
 ## Notes
 
 - **Touch**: Not implemented. The touchpad driver is registered as a stub that always returns "released". Wire up your own touch IC driver if needed.
 - **Frame buffers**: Two full-screen LVGL draw buffers (480×480×2 bytes each) live in PSRAM. The RGB panel frame buffer is also in PSRAM.
+- **Display stability**: The flush callback uses a semaphore pair to wait for vsync before writing to the frame buffer. This prevents display shifting when WiFi is active. Pixel clock is 18 MHz (Waveshare's reference value) rather than 30 MHz for the same reason.
 - **Backlight**: Call `Set_Backlight(brightness)` with a value 0–100 at any time to adjust brightness.
 
 ## License

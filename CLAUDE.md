@@ -84,14 +84,17 @@ The order in `setup()` is critical — do not reorder:
 ## Display & LVGL Configuration
 
 - Resolution: 480×480, 16-bit RGB565
-- Pixel clock: 30 MHz
+- Pixel clock: 18 MHz (reduced from 30 MHz for stability under WiFi load)
 - Single RGB panel frame buffer in PSRAM; dual LVGL draw buffers (each 480×480×2 bytes) also in PSRAM
 - Bounce buffer: 10 × LCD_HEIGHT bytes (prevents screen drift artifacts)
 - LVGL tick: 2 ms timer; `lv_timer_handler()` called every 5 ms from `loop()`
+- Vsync sync: flush callback uses a semaphore pair (`sem_gui_ready` / `sem_vsync_end`) to wait for vsync before writing to the frame buffer — prevents display shift when WiFi is active
 
 ## Wireless
 
-`Wifi_Scan()` and `Bluetooth_Scan()` in `Wireless.cpp` each spawn an independent FreeRTOS task pinned to core 0. Call them after `setup()` completes — they return immediately and do not block the LVGL loop on core 1. Results are stored in `WIFI_NUM` and `BLE_NUM`.
+`Wifi_Scan()`, `Wifi_Connect(ssid, password)`, and `Bluetooth_Scan()` in `Wireless.cpp` each spawn an independent FreeRTOS task pinned to core 0. Call them after `setup()` completes — they return immediately and do not block the LVGL loop on core 1. Results are stored in `WIFI_NUM`, `BLE_NUM`, and `WIFI_Connection`.
+
+WiFi credentials go in `include/secrets.h` (gitignored — copy from `include/secrets.h.example`). When present, `main.cpp` picks them up via `#if defined(WIFI_SSID) && defined(WIFI_PASSWORD)` and calls `Wifi_Connect()` automatically.
 
 ## Conventions
 
