@@ -21,7 +21,10 @@ PlatformIO project that serves as a starter template for the **Waveshare ESP32-S
 ## Project Structure
 
 ```
-platformio.ini.example           PlatformIO config template (copy to platformio.ini)
+platformio.ini                   PlatformIO config (gitignored — copy from .example)
+platformio.ini.example           PlatformIO config template
+docs/
+  ESP32-S3-Touch-LCD-2.8C_schematic_diagram.pdf
 src/
   main.cpp                         Main sketch (setup/loop)
   Display_ST7701.cpp               ST7701 init over SPI + RGB panel driver + backlight PWM

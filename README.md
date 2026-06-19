@@ -50,9 +50,12 @@ Dependencies are fetched automatically by PlatformIO — no manual library insta
 ## Project Structure
 
 ```
-platformio.ini.example           PlatformIO config template (copy to platformio.ini)
+platformio.ini                   PlatformIO config (gitignored — copy from .example)
+platformio.ini.example           PlatformIO config template
+docs/
+  ESP32-S3-Touch-LCD-2.8C_schematic_diagram.pdf
 src/
-  esp32-s3-lcd-2.8c-template.ino  Entry point — setup() / loop()
+  main.cpp                         Entry point — setup() / loop()
   Display_ST7701.cpp               ST7701 SPI init, RGB panel driver, backlight PWM
   LVGL_Driver.cpp                  LVGL init, frame buffers, flush callback, tick timer
   I2C_Driver.cpp                   I2C bus driver (SDA=15, SCL=7)
