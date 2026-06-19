@@ -36,6 +36,10 @@ include/
   lv_conf.h                        LVGL compile-time configuration
 ```
 
+## Hardware Reference
+
+The board schematic is at `docs/ESP32-S3-Touch-LCD-2.8C_schematic_diagram.pdf`. Consult it when you need to understand how components are wired, trace signal paths, or verify pin connections not listed below.
+
 ## Key Hardware Details
 
 ### Pin Assignments
@@ -59,7 +63,7 @@ include/
 |---|---|
 | EXIO_PIN1 | ST7701 Reset |
 | EXIO_PIN3 | ST7701 Chip Select |
-| EXIO_PIN8 | Backlight enable |
+| EXIO_PIN8 | Backlight enable (note: schematic shows P7 wired to buzzer — may be a board revision difference) |
 
 ## Initialization Order
 
