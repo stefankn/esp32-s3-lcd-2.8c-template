@@ -36,7 +36,14 @@ A starter template for the [Waveshare ESP32-S3-LCD-2.8C](https://www.waveshare.c
    ```sh
    cp platformio.ini.example platformio.ini
    ```
-3. (Optional) Uncomment and set `upload_port` / `monitor_port` in `platformio.ini` if PlatformIO does not auto-detect your device
+3. (Optional) If PlatformIO does not auto-detect your device, set the port explicitly in `platformio.ini`:
+   ```ini
+   ; Set your port here, e.g. /dev/cu.usbmodem* on Mac, COM3 on Windows
+   ; Leave commented out to let PlatformIO auto-detect
+   ; upload_port = /dev/cu.usbmodem5B610422091
+   ; monitor_port = /dev/cu.usbmodem5B610422091
+   ```
+   Uncomment the last two lines and replace the value with your actual port.
 
 Dependencies are fetched automatically by PlatformIO — no manual library installation needed.
 
