@@ -31,11 +31,13 @@ src/
   LVGL_Driver.cpp                  LVGL init, frame buffers, flush callback, tick timer
   I2C_Driver.cpp                   I2C bus (SDA=15, SCL=7)
   TCA9554PWR.cpp                   TCA9554 GPIO expander at I2C 0x20
+  Wireless.cpp                     WiFi and Bluetooth scan utilities
 include/
   Display_ST7701.h
   LVGL_Driver.h
   I2C_Driver.h
   TCA9554PWR.h
+  Wireless.h                       WiFi/Bluetooth scan API
   lv_conf.h                        LVGL compile-time configuration
 ```
 
@@ -86,6 +88,10 @@ The order in `setup()` is critical — do not reorder:
 - Single RGB panel frame buffer in PSRAM; dual LVGL draw buffers (each 480×480×2 bytes) also in PSRAM
 - Bounce buffer: 10 × LCD_HEIGHT bytes (prevents screen drift artifacts)
 - LVGL tick: 2 ms timer; `lv_timer_handler()` called every 5 ms from `loop()`
+
+## Wireless
+
+`Wifi_Scan()` and `Bluetooth_Scan()` in `Wireless.cpp` each spawn an independent FreeRTOS task pinned to core 0. Call them after `setup()` completes — they return immediately and do not block the LVGL loop on core 1. Results are stored in `WIFI_NUM` and `BLE_NUM`.
 
 ## Conventions
 

@@ -20,6 +20,7 @@ A starter template for the [Waveshare ESP32-S3-LCD-2.8C](https://www.waveshare.c
 - LVGL 8.3.9 integrated with dual PSRAM frame buffers
 - Backlight PWM control (`Set_Backlight(0–100)`)
 - TCA9554 GPIO expander driver for display reset/CS/backlight enable
+- WiFi and Bluetooth scan utilities (`Wifi_Scan()` / `Bluetooth_Scan()`) — run as background FreeRTOS tasks on core 0
 - "Hello" label as a minimal working UI example
 
 ## Requirements
@@ -60,11 +61,13 @@ src/
   LVGL_Driver.cpp                  LVGL init, frame buffers, flush callback, tick timer
   I2C_Driver.cpp                   I2C bus driver (SDA=15, SCL=7)
   TCA9554PWR.cpp                   TCA9554 8-bit GPIO expander driver
+  Wireless.cpp                     WiFi and Bluetooth scan utilities
 include/
   Display_ST7701.h
   LVGL_Driver.h
   I2C_Driver.h
   TCA9554PWR.h
+  Wireless.h                       WiFi/Bluetooth scan API
   lv_conf.h                        LVGL compile-time configuration
 ```
 
@@ -137,6 +140,18 @@ void setup() {
 ```
 
 Keep large allocations in PSRAM using `heap_caps_malloc(size, MALLOC_CAP_SPIRAM)` to preserve internal SRAM for LVGL objects and stack.
+
+## Wireless
+
+`Wifi_Scan()` and `Bluetooth_Scan()` are independent — call either or both after `Lvgl_Init()`. Each spawns a FreeRTOS task on core 0 and returns immediately, so the display loop on core 1 is unaffected. Results land in `WIFI_NUM` and `BLE_NUM` and are logged to serial.
+
+```cpp
+#include "Wireless.h"
+
+// In setup(), after Lvgl_Init():
+Wifi_Scan();       // logs SSIDs and RSSI, stores count in WIFI_NUM
+Bluetooth_Scan();  // 5-second BLE scan, stores count in BLE_NUM
+```
 
 ## Notes
 

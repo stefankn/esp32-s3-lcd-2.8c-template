@@ -1,9 +1,10 @@
-#include <Arduino.h>
 #include "LVGL_Driver.h"
+#include "Wireless.h"
+#include <Arduino.h>
 
 void setup() {
   Serial.begin(115200);
-  delay(1000);  // wait for serial to connect
+  delay(1000); // wait for serial to connect
 
   Serial.println();
   Serial.println("Setup starting");
@@ -41,6 +42,10 @@ void setup() {
   lv_obj_set_style_text_color(label, lv_color_white(), 0);
   lv_obj_set_style_text_font(label, &lv_font_montserrat_48, 0);
   lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+
+  // Start WiFi and Bluetooth scans as independent background tasks on core 0
+  //Wifi_Scan();
+  //Bluetooth_Scan();
 
   Serial.println("Setup completed");
 }
