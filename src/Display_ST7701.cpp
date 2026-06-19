@@ -1,7 +1,9 @@
 #include "Display_ST7701.h"  
       
-spi_device_handle_t SPI_handle = NULL;     
-esp_lcd_panel_handle_t panel_handle = NULL;            
+spi_device_handle_t SPI_handle = NULL;
+esp_lcd_panel_handle_t panel_handle = NULL;
+SemaphoreHandle_t sem_gui_ready = NULL;
+SemaphoreHandle_t sem_vsync_end = NULL;            
 void ST7701_WriteCommand(uint8_t cmd)
 {
   spi_transaction_t spi_tran = {
@@ -372,11 +374,13 @@ void ST7701_Init()
       .fb_in_psram = true,                                                                        // 如果启用此标志，帧缓冲区将优先从PSRAM分配
     },
   };
-  esp_lcd_new_rgb_panel(&rgb_config, &panel_handle); 
-  // esp_lcd_rgb_panel_event_callbacks_t cbs = {
-  //   .on_vsync = example_on_vsync_event,
-  // };
-  // esp_lcd_rgb_panel_register_event_callbacks(panel_handle, &cbs, &disp_drv);
+  esp_lcd_new_rgb_panel(&rgb_config, &panel_handle);
+  sem_gui_ready = xSemaphoreCreateBinary();
+  sem_vsync_end = xSemaphoreCreateBinary();
+  esp_lcd_rgb_panel_event_callbacks_t cbs = {
+    .on_vsync = example_on_vsync_event,
+  };
+  esp_lcd_rgb_panel_register_event_callbacks(panel_handle, &cbs, NULL);
   esp_lcd_panel_reset(panel_handle);
   esp_lcd_panel_init(panel_handle);
 }
@@ -384,6 +388,9 @@ void ST7701_Init()
 bool example_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_panel_event_data_t *event_data, void *user_data)
 {
   BaseType_t high_task_awoken = pdFALSE;
+  if (xSemaphoreTakeFromISR(sem_gui_ready, &high_task_awoken) == pdTRUE) {
+    xSemaphoreGiveFromISR(sem_vsync_end, &high_task_awoken);
+  }
   return high_task_awoken == pdTRUE;
 }
 void LCD_Init() {
