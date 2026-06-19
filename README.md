@@ -26,7 +26,12 @@ A starter template for the [Waveshare ESP32-S3-LCD-2.8C](https://www.waveshare.c
 
 ### PlatformIO Setup
 
-1. Install the [PlatformIO CLI](https://docs.platformio.org/en/latest/core/installation/index.html)
+1. Create and activate a Python virtual environment, then install the PlatformIO CLI:
+   ```sh
+   python -m venv .venv
+   source .venv/bin/activate
+   pip install platformio
+   ```
 2. Copy `platformio.ini.example` to `platformio.ini`:
    ```sh
    cp platformio.ini.example platformio.ini
