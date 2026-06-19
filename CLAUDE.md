@@ -7,7 +7,7 @@ PlatformIO project that serves as a starter template for the **Waveshare ESP32-S
 ## Build System
 
 - **Build tool**: PlatformIO CLI
-- **Framework**: Arduino (entry point is `src/esp32-s3-lcd-2.8c-template.ino`)
+- **Framework**: Arduino (entry point is `src/main.cpp`)
 - **Config**: Copy `platformio.ini.example` to `platformio.ini` before building
 - **Dependencies**: Managed by PlatformIO (`lvgl/lvgl@^8.3.0`)
 - **PSRAM**: Enabled via `board_build.arduino.memory_type = qio_opi` in `platformio.ini`
@@ -23,7 +23,7 @@ PlatformIO project that serves as a starter template for the **Waveshare ESP32-S
 ```
 platformio.ini.example           PlatformIO config template (copy to platformio.ini)
 src/
-  esp32-s3-lcd-2.8c-template.ino  Main sketch (setup/loop)
+  main.cpp                         Main sketch (setup/loop)
   Display_ST7701.cpp               ST7701 init over SPI + RGB panel driver + backlight PWM
   LVGL_Driver.cpp                  LVGL init, frame buffers, flush callback, tick timer
   I2C_Driver.cpp                   I2C bus (SDA=15, SCL=7)
