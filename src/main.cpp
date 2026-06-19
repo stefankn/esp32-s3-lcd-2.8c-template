@@ -2,6 +2,10 @@
 #include "Wireless.h"
 #include <Arduino.h>
 
+#if __has_include("secrets.h")
+#include "secrets.h"
+#endif
+
 void setup() {
   Serial.begin(115200);
   delay(1000); // wait for serial to connect
@@ -46,6 +50,10 @@ void setup() {
   // Start WiFi and Bluetooth scans as independent background tasks on core 0
   //Wifi_Scan();
   //Bluetooth_Scan();
+
+#if defined(WIFI_SSID) && defined(WIFI_PASSWORD)
+  Wifi_Connect(WIFI_SSID, WIFI_PASSWORD);
+#endif
 
   Serial.println("Setup completed");
 }

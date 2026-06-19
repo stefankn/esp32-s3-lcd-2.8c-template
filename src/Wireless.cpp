@@ -8,6 +8,46 @@ bool    WIFI_Connection = false;
 uint8_t WIFI_NUM        = 0;
 uint8_t BLE_NUM         = 0;
 
+struct WifiConnectParams {
+  char ssid[64];
+  char password[64];
+};
+
+static void WifiConnectTask(void *parameter)
+{
+  WifiConnectParams *params = static_cast<WifiConnectParams *>(parameter);
+
+  Serial.println();
+  Serial.printf("Connecting to %s", params->ssid);
+
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(params->ssid, params->password);
+  delete params;
+
+  const int timeout_ms = 10000;
+  const int interval_ms = 500;
+  int elapsed = 0;
+
+  while (WiFi.status() != WL_CONNECTED && elapsed < timeout_ms) {
+    vTaskDelay(pdMS_TO_TICKS(interval_ms));
+    elapsed += interval_ms;
+    Serial.print(".");
+  }
+  Serial.println();
+
+  if (WiFi.status() == WL_CONNECTED) {
+    WIFI_Connection = true;
+    Serial.printf("Connected — IP: %s\n", WiFi.localIP().toString().c_str());
+  } else {
+    WIFI_Connection = false;
+    Serial.println("Connection failed (timeout)");
+    WiFi.disconnect(true);
+    WiFi.mode(WIFI_OFF);
+  }
+
+  vTaskDelete(NULL);
+}
+
 static void WifiScanTask(void *parameter)
 {
   Serial.println();
@@ -60,6 +100,23 @@ void Wifi_Scan(void)
     "WifiScanTask",
     4096,
     NULL,
+    1,
+    NULL,
+    0
+  );
+}
+
+void Wifi_Connect(const char *ssid, const char *password)
+{
+  WifiConnectParams *params = new WifiConnectParams();
+  strncpy(params->ssid, ssid, sizeof(params->ssid) - 1);
+  strncpy(params->password, password, sizeof(params->password) - 1);
+
+  xTaskCreatePinnedToCore(
+    WifiConnectTask,
+    "WifiConnectTask",
+    4096,
+    params,
     1,
     NULL,
     0
