@@ -69,6 +69,8 @@ include/
   TCA9554PWR.h
   Wireless.h                       WiFi/Bluetooth scan API
   lv_conf.h                        LVGL compile-time configuration
+  secrets.h.example                WiFi credentials template (copy to secrets.h)
+  secrets.h                        WiFi credentials (gitignored — do not commit)
 ```
 
 ## Pin Reference
