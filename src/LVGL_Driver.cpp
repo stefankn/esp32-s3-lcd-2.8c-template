@@ -1,7 +1,7 @@
 /*****************************************************************************
   | File        :   LVGL_Driver.c
-  
-  | help        : 
+
+  | help        :
     The provided LVGL library file must be installed first
 ******************************************************************************/
 #include "LVGL_Driver.h"
@@ -15,7 +15,7 @@ void* buf2 = NULL;
 // static lv_color_t buf2[ LVGL_BUF_LEN ];
 // static lv_color_t* buf1 = (lv_color_t*) heap_caps_malloc(LVGL_BUF_LEN, MALLOC_CAP_SPIRAM);
 // static lv_color_t* buf2 = (lv_color_t*) heap_caps_malloc(LVGL_BUF_LEN, MALLOC_CAP_SPIRAM);
-    
+
 
 
 /* Serial debugging */
@@ -25,7 +25,7 @@ void Lvgl_print(const char * buf)
     // Serial.flush();
 }
 
-/*  Display flushing 
+/*  Display flushing
     Displays LVGL content on the LCD
     This function implements associating LVGL data to the LCD screen
 */
@@ -49,11 +49,11 @@ void example_increase_lvgl_tick(void *arg)
 void Lvgl_Init(void)
 {
   lv_init();
-  // esp_lcd_rgb_panel_get_frame_buffer(panel_handle, 2, &buf1, &buf2);                                          
-  
+  // esp_lcd_rgb_panel_get_frame_buffer(panel_handle, 2, &buf1, &buf2);
+
   buf1 = (lv_color_t*) heap_caps_malloc(LVGL_BUF_LEN, MALLOC_CAP_SPIRAM);
   buf2 = (lv_color_t*) heap_caps_malloc(LVGL_BUF_LEN, MALLOC_CAP_SPIRAM);
-  lv_disp_draw_buf_init( &draw_buf, buf1, buf2, ESP_PANEL_LCD_WIDTH * ESP_PANEL_LCD_HEIGHT);                    
+  lv_disp_draw_buf_init( &draw_buf, buf1, buf2, ESP_PANEL_LCD_WIDTH * ESP_PANEL_LCD_HEIGHT);
 
   /*Initialize the display*/
   lv_disp_drv_init( &disp_drv );
@@ -61,7 +61,7 @@ void Lvgl_Init(void)
   disp_drv.hor_res = LVGL_WIDTH;
   disp_drv.ver_res = LVGL_HEIGHT;
   disp_drv.flush_cb = Lvgl_Display_LCD;
-  // disp_drv.full_refresh = 1;                                                                                  
+  // disp_drv.full_refresh = 1;
   disp_drv.draw_buf = &draw_buf;
   disp_drv.user_data = panel_handle;
   lv_disp_drv_register( &disp_drv );

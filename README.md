@@ -76,7 +76,7 @@ include/
   I2C_Driver.h
   TCA9554PWR.h
   Wireless.h                       WiFi/Bluetooth scan API
-  Clock.h                          Clock_Init() — call after Lvgl_Init()
+  Clock.h                          Clock_Init(parent, font, y) — call after Lvgl_Init()
   lv_conf.h                        LVGL compile-time configuration
   secrets.h.example                WiFi credentials template (copy to secrets.h)
   secrets.h                        WiFi credentials (gitignored — do not commit)
@@ -235,7 +235,7 @@ LVGL fonts are pre-rendered C arrays. To add a custom font:
 
 - **Touch**: Not implemented. The touchpad driver is registered as a stub that always returns "released". Wire up your own touch IC driver if needed.
 - **Frame buffers**: Two full-screen LVGL draw buffers (480×480×2 bytes each) live in PSRAM. The RGB panel frame buffer is also in PSRAM.
-- **Display stability**: The flush callback uses a semaphore pair to wait for vsync before writing to the frame buffer. This prevents display shifting when WiFi is active. Pixel clock is 18 MHz (Waveshare's reference value) rather than 30 MHz for the same reason.
+- **Display stability**: The flush callback uses a semaphore pair to wait for vsync before writing to the frame buffer. This prevents display shifting when WiFi is active. Pixel clock is 18 MHz rather than 30 MHz for the same reason. The bounce buffer is set to 20 × LCD_HEIGHT (19.2 KB) to reduce DMA interrupt frequency and minimise artifacts under WiFi load.
 - **Backlight**: Call `Set_Backlight(brightness)` with a value 0–100 at any time to adjust brightness.
 - **Buzzer**: Active buzzer on TCA9554 P7 — fixed tone, on/off only via `Set_EXIO(EXIO_PIN8, High/Low)`. Volume and pitch are not software-controllable. The clock double-beeps on the hour and single-beeps on the half hour; beep sequences run as FreeRTOS tasks on core 0 to keep the display loop unblocked.
 
