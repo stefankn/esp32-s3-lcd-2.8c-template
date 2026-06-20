@@ -24,6 +24,7 @@ PlatformIO project that serves as a starter template for the **Waveshare ESP32-S
 ## Project Structure
 
 ```
+Makefile                         Common development commands (build, flash, monitor, etc.)
 platformio.ini                   PlatformIO config (gitignored — copy from .example)
 platformio.ini.example           PlatformIO config template
 docs/

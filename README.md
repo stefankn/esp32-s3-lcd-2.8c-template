@@ -51,6 +51,7 @@ Dependencies are fetched automatically by PlatformIO — no manual library insta
 ## Project Structure
 
 ```
+Makefile                         Common development commands (build, flash, monitor, etc.)
 platformio.ini                   PlatformIO config (gitignored — copy from .example)
 platformio.ini.example           PlatformIO config template
 docs/
