@@ -109,22 +109,33 @@ include/
 
 1. Clone or download this repository
 2. Copy `platformio.ini.example` to `platformio.ini`
-3. Build and flash: `pio run -t upload`
+3. Build and flash: `make run`
 4. The display should show a black screen with a white "Hello" label
 
-If you encounter build issues, clean the build directory with `pio run -t clean` and retry.
+If you encounter build issues, run `make clean` and retry.
 
-Monitor serial output with `pio device monitor --baud 115200`.
+### Common Commands
+
+| Command | Description |
+|---|---|
+| `make build` | Compile the project |
+| `make run` | Flash firmware and open serial monitor |
+| `make upload` | Flash firmware only |
+| `make monitor` | Open serial monitor (115200 baud) |
+| `make compiledb` | Regenerate `compile_commands.json` for LSP |
+| `make clean` | Clean build artifacts |
+
+Override the baud rate with `make monitor BAUD=9600`.
 
 ### LSP / Editor Integration
 
 Generate a `compile_commands.json` file so your editor's C/C++ language server (clangd, ccls, etc.) can resolve includes, macros, and flags correctly:
 
 ```sh
-pio run -t compiledb
+make compiledb
 ```
 
-This writes `compile_commands.json` to the project root. Point your LSP at it (clangd picks it up automatically; for other servers set the `compilationDatabasePath` option). Re-run the command after adding or removing source files, or after changing build flags in `platformio.ini`.
+This writes `compile_commands.json` to the project root. Point your LSP at it (clangd picks it up automatically; for other servers set the `compilationDatabasePath` option). Re-run after adding or removing source files, or after changing build flags in `platformio.ini`.
 
 ## Adding Your UI
 

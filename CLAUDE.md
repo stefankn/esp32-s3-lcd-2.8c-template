@@ -14,9 +14,12 @@ PlatformIO project that serves as a starter template for the **Waveshare ESP32-S
 
 ### Common Commands
 
-- Build & flash: `pio run -t upload`
-- Clean build: `pio run -t clean`
-- Serial monitor: `pio device monitor --baud 115200`
+- Build: `make build`
+- Build & flash: `make run`
+- Flash only: `make upload`
+- Serial monitor: `make monitor`
+- Regenerate compile_commands.json: `make compiledb`
+- Clean build: `make clean`
 
 ## Project Structure
 
