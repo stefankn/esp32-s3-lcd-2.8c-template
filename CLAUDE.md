@@ -74,13 +74,13 @@ The board schematic is at `docs/ESP32-S3-Touch-LCD-2.8C_schematic_diagram.pdf`. 
 |---|---|
 | EXIO_PIN1 | ST7701 Reset |
 | EXIO_PIN3 | ST7701 Chip Select |
-| EXIO_PIN8 | Backlight enable (note: schematic shows P7 wired to buzzer — may be a board revision difference) |
+| EXIO_PIN8 | Buzzer (active buzzer via NPN transistor Q5; High = on, Low = off) |
 
 ## Initialization Order
 
 The order in `setup()` is critical — do not reorder:
 1. Serial → I2C → TCA9554 init (all outputs)
-2. Pull EXIO_PIN8 low (prevents backlight flicker during LCD init)
+2. Pull EXIO_PIN8 low (silences buzzer during LCD init)
 3. Backlight PWM init
 4. Backlight set to 100%
 5. ST7701 LCD controller init (SPI + ~62 config commands)
@@ -108,5 +108,6 @@ WiFi credentials go in `include/secrets.h` (gitignored — copy from `include/se
 
 - Touch is stubbed — `LVGL_Driver` registers a dummy touchpad that always returns "released"
 - Backlight is controlled via `Set_Backlight(0–100)` (percentage)
+- Buzzer is controlled via `Set_EXIO(EXIO_PIN8, High/Low)` — active buzzer, fixed tone, on/off only
 - Add new UI code in `setup()` after `Lvgl_Init()`, or factor it into a separate `.cpp` file
 - Keep frame buffer allocations in PSRAM (`MALLOC_CAP_SPIRAM`) to avoid exhausting internal SRAM

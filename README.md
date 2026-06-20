@@ -21,8 +21,9 @@ A starter template for the [Waveshare ESP32-S3-LCD-2.8C](https://www.waveshare.c
 - ESP32-S3 RGB LCD peripheral configured for 480×480 @ 18 MHz pixel clock
 - LVGL 8.3.9 integrated with dual PSRAM frame buffers, vsync-synchronised flush
 - Backlight PWM control (`Set_Backlight(0–100)`)
-- TCA9554 GPIO expander driver for display reset/CS/backlight enable
+- TCA9554 GPIO expander driver for display reset, CS, and buzzer control
 - WiFi connect with internet reachability check (`Wifi_Connect()`) and scan utilities (`Wifi_Scan()` / `Bluetooth_Scan()`) — run as background FreeRTOS tasks on core 0
+- Buzzer support via TCA9554 P7 (`Set_EXIO(EXIO_PIN8, High/Low)`) — two short startup beeps included
 - "Hello" label as a minimal working UI example
 
 ## Requirements
@@ -192,6 +193,7 @@ cp include/secrets.h.example include/secrets.h
 - **Frame buffers**: Two full-screen LVGL draw buffers (480×480×2 bytes each) live in PSRAM. The RGB panel frame buffer is also in PSRAM.
 - **Display stability**: The flush callback uses a semaphore pair to wait for vsync before writing to the frame buffer. This prevents display shifting when WiFi is active. Pixel clock is 18 MHz (Waveshare's reference value) rather than 30 MHz for the same reason.
 - **Backlight**: Call `Set_Backlight(brightness)` with a value 0–100 at any time to adjust brightness.
+- **Buzzer**: Active buzzer on TCA9554 P7 — fixed tone, on/off only via `Set_EXIO(EXIO_PIN8, High/Low)`. Volume and pitch are not software-controllable.
 
 ## License
 
