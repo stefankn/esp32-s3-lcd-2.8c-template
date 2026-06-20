@@ -5,6 +5,8 @@
     The provided LVGL library file must be installed first
 ******************************************************************************/
 #include "LVGL_Driver.h"
+#include "Touch.h"
+#include <Arduino.h>
 
 lv_disp_drv_t disp_drv;
 
@@ -39,7 +41,14 @@ void Lvgl_Display_LCD( lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_
 /*Read the touchpad*/
 void Lvgl_Touchpad_Read( lv_indev_drv_t * indev_drv, lv_indev_data_t * data )
 {
-  data->state = LV_INDEV_STATE_REL;
+  int16_t x, y;
+  if (Touch_GetPoint(&x, &y)) {
+    data->point.x = x;
+    data->point.y = y;
+    data->state = LV_INDEV_STATE_PR;
+  } else {
+    data->state = LV_INDEV_STATE_REL;
+  }
 }
 void example_increase_lvgl_tick(void *arg)
 {

@@ -82,16 +82,26 @@ The board schematic is at `docs/ESP32-S3-Touch-LCD-2.8C_schematic_diagram.pdf`. 
 | EXIO_PIN3 | ST7701 Chip Select |
 | EXIO_PIN8 | Buzzer (active buzzer via NPN transistor Q5; High = on, Low = off) |
 
+### Other I2C Devices (confirmed via boot scan)
+
+| Address | Device |
+|---|---|
+| 0x51 | PCF85063 RTC |
+| 0x5D | GT911 capacitive touch controller |
+| 0x6B | QMI8658C IMU (gyro/accelerometer, SA0=1) |
+| 0x7E | Unknown |
+
 ## Initialization Order
 
 The order in `setup()` is critical — do not reorder:
 1. Serial → I2C → TCA9554 init (all outputs)
-2. Pull EXIO_PIN8 low (silences buzzer during LCD init)
-3. Backlight PWM init
-4. Backlight set to 100%
-5. ST7701 LCD controller init (SPI + ~62 config commands)
-6. LVGL init (allocates dual PSRAM frame buffers, registers flush/tick)
-7. Build initial UI
+2. `Touch_Init()` — clears GT911 stale buffer-ready flag (must be before LCD init)
+3. Pull EXIO_PIN8 low (silences buzzer during LCD init)
+4. Backlight PWM init
+5. Backlight set to 100%
+6. ST7701 LCD controller init (SPI + ~62 config commands)
+7. LVGL init (allocates dual PSRAM frame buffers, registers flush/tick)
+8. Build initial UI
 
 ## Display & LVGL Configuration
 
@@ -114,7 +124,7 @@ After WiFi connects, `Clock.cpp` starts NTP sync via `configTzTime()`. The timez
 
 ## Conventions
 
-- Touch is stubbed — `LVGL_Driver` registers a dummy touchpad that always returns "released"
+- Touch is handled by `src/Touch.cpp` — GT911 at I2C 0x5D, polled via `Lvgl_Touchpad_Read` every LVGL tick. Uses 16-bit register addresses over `Wire` directly (GT911 protocol is incompatible with `I2C_Read()`). Key protocol detail: the buffer-ready flag at 0x814E must be cleared after every read, including "finger lifted" events (status=0x80, count=0) — failing to clear on lift locks out all subsequent touches
 - Backlight is controlled via `Set_Backlight(0–100)` (percentage)
 - Buzzer is controlled via `Set_EXIO(EXIO_PIN8, High/Low)` — active buzzer, fixed tone, on/off only
 - `Clock_Init(parent, font, y)` creates the hour/colon/minute labels internally, starts the 1 s display timer and NTP polling timer; call it after `Lvgl_Init()`

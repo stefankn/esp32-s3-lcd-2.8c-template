@@ -1,6 +1,7 @@
 #include "LVGL_Driver.h"
 #include "Wireless.h"
 #include "Clock.h"
+#include "Touch.h"
 #include <Arduino.h>
 
 #if __has_include("secrets.h")
@@ -8,6 +9,19 @@
 #endif
 
 LV_IMG_DECLARE(cats);
+
+static void touch_event_cb(lv_event_t *e) {
+  lv_event_code_t code = lv_event_get_code(e);
+  lv_point_t p;
+  lv_indev_get_point(lv_indev_get_act(), &p);
+  switch (code) {
+    case LV_EVENT_PRESSED:            Serial.printf("PRESSED      x=%d y=%d\n", p.x, p.y); break;
+    case LV_EVENT_RELEASED:           Serial.printf("RELEASED     x=%d y=%d\n", p.x, p.y); break;
+    case LV_EVENT_CLICKED:            Serial.printf("CLICKED      x=%d y=%d\n", p.x, p.y); break;
+    case LV_EVENT_LONG_PRESSED:       Serial.printf("LONG_PRESSED x=%d y=%d\n", p.x, p.y); break;
+    default: break;
+  }
+}
 
 void setup() {
   Serial.begin(115200);
@@ -25,6 +39,8 @@ void setup() {
   // Initialize the GPIO expander chip (all pins set as outputs)
   TCA9554PWR_Init(0x00);
 
+  Touch_Init();
+
   // Pull backlight enable pin low before initializing (avoid flicker)
   Set_EXIO(EXIO_PIN8, Low);
 
@@ -39,6 +55,8 @@ void setup() {
 
   // Initialize LVGL and connect it to the display hardware
   Lvgl_Init();
+
+  lv_obj_add_event_cb(lv_scr_act(), touch_event_cb, LV_EVENT_ALL, NULL);
 
   // Set background to black
   lv_obj_set_style_bg_color(lv_scr_act(), lv_color_black(), 0);

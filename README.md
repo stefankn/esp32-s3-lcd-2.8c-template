@@ -13,6 +13,7 @@ A starter template for the [Waveshare ESP32-S3-LCD-2.8C](https://docs.waveshare.
 | **Display** | 2.8-inch IPS, 480×480, ST7701 controller |
 | **Interface** | 16-bit RGB565 parallel panel via ESP32-S3 RGB LCD peripheral |
 | **GPIO expander** | TCA9554PWR (I2C, address 0x20) |
+| **Touch** | GT911 capacitive touch controller (I2C, address 0x5D) |
 | **PSRAM** | Required — frame buffers are allocated from PSRAM |
 
 ## Features
@@ -22,6 +23,7 @@ A starter template for the [Waveshare ESP32-S3-LCD-2.8C](https://docs.waveshare.
 - LVGL 8.3.9 integrated with dual PSRAM frame buffers, vsync-synchronised flush
 - Backlight PWM control (`Set_Backlight(0–100)`)
 - TCA9554 GPIO expander driver for display reset, CS, and buzzer control
+- GT911 capacitive touch driver (`Touch_Init()` / `Touch_GetPoint()`) — polling-based, wired into LVGL's input device system
 - WiFi connect with internet reachability check (`Wifi_Connect()`) and scan utilities (`Wifi_Scan()` / `Bluetooth_Scan()`) — run as background FreeRTOS tasks on core 0
 - Buzzer support via TCA9554 P7 (`Set_EXIO(EXIO_PIN8, High/Low)`) — double beep on the hour, single beep on the half hour
 - Sample app: full-screen LVGL image as background with an NTP-synced 24-hour clock overlaid using the Digital-7 font
@@ -66,6 +68,7 @@ src/
   LVGL_Driver.cpp                  LVGL init, frame buffers, flush callback, tick timer
   I2C_Driver.cpp                   I2C bus driver (SDA=15, SCL=7)
   TCA9554PWR.cpp                   TCA9554 8-bit GPIO expander driver
+  Touch.cpp                        GT911 touch driver — polling via Wire, wired to LVGL input device
   Wireless.cpp                     WiFi and Bluetooth scan utilities
   Clock.cpp                        NTP time sync, 24h clock display, hourly/half-hourly beeps
   sample_image.c                   Background image (LVGL C array, 480×480, CF_TRUE_COLOR)
@@ -75,6 +78,7 @@ include/
   LVGL_Driver.h
   I2C_Driver.h
   TCA9554PWR.h
+  Touch.h                          Touch_Init() / Touch_GetPoint() — call Touch_Init() after TCA9554 init
   Wireless.h                       WiFi/Bluetooth scan API
   Clock.h                          Clock_Init(parent, font, y) — call after Lvgl_Init()
   lv_conf.h                        LVGL compile-time configuration
