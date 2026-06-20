@@ -33,7 +33,7 @@ static void time_timer_cb(lv_timer_t *timer) {
       if (timeinfo.tm_min == 0)  beeps = 2;  // full hour: double beep
       if (timeinfo.tm_min == 30) beeps = 1;  // half hour: single beep
       if (beeps > 0) {
-        xTaskCreatePinnedToCore(beep_task, "beep", 1024, (void *)beeps, 1, NULL, 0);
+        xTaskCreatePinnedToCore(beep_task, "beep", 4096, (void *)beeps, 1, NULL, 0);
       }
     }
   }
