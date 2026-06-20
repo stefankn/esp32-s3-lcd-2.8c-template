@@ -24,7 +24,7 @@ A starter template for the [Waveshare ESP32-S3-LCD-2.8C](https://www.waveshare.c
 - TCA9554 GPIO expander driver for display reset, CS, and buzzer control
 - WiFi connect with internet reachability check (`Wifi_Connect()`) and scan utilities (`Wifi_Scan()` / `Bluetooth_Scan()`) — run as background FreeRTOS tasks on core 0
 - Buzzer support via TCA9554 P7 (`Set_EXIO(EXIO_PIN8, High/Low)`) — double beep on the hour, single beep on the half hour
-- Sample app: full-screen LVGL image as background with an NTP-synced 24-hour clock overlaid
+- Sample app: full-screen LVGL image as background with an NTP-synced 24-hour clock overlaid using the Digital-7 font
 - Configurable timezone via `include/config.h` (POSIX tz string, DST-aware)
 
 ## Requirements
@@ -69,6 +69,7 @@ src/
   Wireless.cpp                     WiFi and Bluetooth scan utilities
   Clock.cpp                        NTP time sync, 24h clock display, hourly/half-hourly beeps
   sample_image.c                   Background image (LVGL C array, 480×480, CF_TRUE_COLOR)
+  digital7_72.c                    Digital-7 font at 72px (converted for LVGL 8, digits + colon + hyphen)
 include/
   Display_ST7701.h
   LVGL_Driver.h
@@ -206,6 +207,29 @@ cp include/config.h.example include/config.h
 ```
 
 The clock defaults to UTC if `config.h` is absent. POSIX tz strings handle DST transitions automatically — see the [GNU libc TZ documentation](https://www.gnu.org/software/libc/manual/html_node/TZ-Variable.html) and the [IANA timezone database](https://www.iana.org/time-zones) for reference. A convenient lookup table is also available at [nayarsystems/posix_tz_db](https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv).
+
+## Custom Fonts
+
+LVGL fonts are pre-rendered C arrays. To add a custom font:
+
+1. Convert a TTF using the [LVGL font converter](https://lvgl.io/tools/fontconverter) — select the glyph range you need (e.g. `0x2D, 0x30-0x39, 0x3A` for `-0123456789:`)
+2. Drop the generated `.c` file into `src/`
+3. The converter targets LVGL v9 by default. Remove the two v9-only fields from the generated struct before building:
+   ```c
+   // Remove these lines from the generated file:
+   .static_bitmap = 0,
+   #if LV_VERSION_CHECK(8, 2, 0) || LVGL_VERSION_MAJOR >= 9
+       .fallback = &lv_font_...,
+   #endif
+   ```
+4. Declare the font in `include/lv_conf.h`:
+   ```c
+   #define LV_FONT_CUSTOM_DECLARE  LV_FONT_DECLARE(my_font_72)
+   ```
+5. Use it in code:
+   ```cpp
+   lv_obj_set_style_text_font(label, &my_font_72, 0);
+   ```
 
 ## Notes
 
