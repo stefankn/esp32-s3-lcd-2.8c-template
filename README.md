@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/stefankn/esp32-s3-lcd-2.8c-template/actions/workflows/build.yml/badge.svg)](https://github.com/stefankn/esp32-s3-lcd-2.8c-template/actions/workflows/build.yml)
 
-A starter template for the [Waveshare ESP32-S3-LCD-2.8C](https://www.waveshare.com/esp32-s3-lcd-2.8c.htm) development board. Brings up the 480×480 ST7701 RGB display and initialises the LVGL 8 graphics library, ready for your application.
+A starter template for the [Waveshare ESP32-S3-LCD-2.8C](https://www.waveshare.com/esp32-s3-lcd-2.8c.htm) development board. Brings up the 480×480 ST7701 RGB display and initialises the LVGL 8 graphics library, and includes a working sample app: a full-screen background image with an NTP-synced 24-hour clock.
 
 ## Hardware
 
@@ -23,8 +23,9 @@ A starter template for the [Waveshare ESP32-S3-LCD-2.8C](https://www.waveshare.c
 - Backlight PWM control (`Set_Backlight(0–100)`)
 - TCA9554 GPIO expander driver for display reset, CS, and buzzer control
 - WiFi connect with internet reachability check (`Wifi_Connect()`) and scan utilities (`Wifi_Scan()` / `Bluetooth_Scan()`) — run as background FreeRTOS tasks on core 0
-- Buzzer support via TCA9554 P7 (`Set_EXIO(EXIO_PIN8, High/Low)`) — two short startup beeps included
-- "Hello" label as a minimal working UI example
+- Buzzer support via TCA9554 P7 (`Set_EXIO(EXIO_PIN8, High/Low)`) — double beep on the hour, single beep on the half hour
+- Sample app: full-screen LVGL image as background with an NTP-synced 24-hour clock overlaid
+- Configurable timezone via `include/config.h` (POSIX tz string, DST-aware)
 
 ## Requirements
 
@@ -66,15 +67,20 @@ src/
   I2C_Driver.cpp                   I2C bus driver (SDA=15, SCL=7)
   TCA9554PWR.cpp                   TCA9554 8-bit GPIO expander driver
   Wireless.cpp                     WiFi and Bluetooth scan utilities
+  Clock.cpp                        NTP time sync, 24h clock display, hourly/half-hourly beeps
+  sample_image.c                   Background image (LVGL C array, 480×480, CF_TRUE_COLOR)
 include/
   Display_ST7701.h
   LVGL_Driver.h
   I2C_Driver.h
   TCA9554PWR.h
   Wireless.h                       WiFi/Bluetooth scan API
+  Clock.h                          Clock_Init() — call after Lvgl_Init()
   lv_conf.h                        LVGL compile-time configuration
   secrets.h.example                WiFi credentials template (copy to secrets.h)
   secrets.h                        WiFi credentials (gitignored — do not commit)
+  config.h.example                 User configuration template (copy to config.h)
+  config.h                         User configuration — timezone (gitignored — do not commit)
 ```
 
 ## Pin Reference
@@ -114,7 +120,7 @@ include/
 1. Clone or download this repository
 2. Copy `platformio.ini.example` to `platformio.ini`
 3. Build and flash: `make run`
-4. The display should show a black screen with a white "Hello" label
+4. The display shows a background image with a live 24-hour clock (shows `--:--` until NTP syncs)
 
 If you encounter build issues, run `make clean` and retry.
 
@@ -187,13 +193,27 @@ cp include/secrets.h.example include/secrets.h
 
 `secrets.h` is gitignored and must never be committed. When present, `main.cpp` automatically calls `Wifi_Connect(WIFI_SSID, WIFI_PASSWORD)` during `setup()`.
 
+### Timezone
+
+Copy `include/config.h.example` to `include/config.h` and set your timezone as a POSIX tz string:
+
+```sh
+cp include/config.h.example include/config.h
+```
+
+```cpp
+#define TIMEZONE "CET-1CEST,M3.5.0,M10.5.0/3"  // Central Europe with DST
+```
+
+The clock defaults to UTC if `config.h` is absent. POSIX tz strings handle DST transitions automatically — see the [GNU libc TZ documentation](https://www.gnu.org/software/libc/manual/html_node/TZ-Variable.html) and the [IANA timezone database](https://www.iana.org/time-zones) for reference. A convenient lookup table is also available at [nayarsystems/posix_tz_db](https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv).
+
 ## Notes
 
 - **Touch**: Not implemented. The touchpad driver is registered as a stub that always returns "released". Wire up your own touch IC driver if needed.
 - **Frame buffers**: Two full-screen LVGL draw buffers (480×480×2 bytes each) live in PSRAM. The RGB panel frame buffer is also in PSRAM.
 - **Display stability**: The flush callback uses a semaphore pair to wait for vsync before writing to the frame buffer. This prevents display shifting when WiFi is active. Pixel clock is 18 MHz (Waveshare's reference value) rather than 30 MHz for the same reason.
 - **Backlight**: Call `Set_Backlight(brightness)` with a value 0–100 at any time to adjust brightness.
-- **Buzzer**: Active buzzer on TCA9554 P7 — fixed tone, on/off only via `Set_EXIO(EXIO_PIN8, High/Low)`. Volume and pitch are not software-controllable.
+- **Buzzer**: Active buzzer on TCA9554 P7 — fixed tone, on/off only via `Set_EXIO(EXIO_PIN8, High/Low)`. Volume and pitch are not software-controllable. The clock double-beeps on the hour and single-beeps on the half hour; beep sequences run as FreeRTOS tasks on core 0 to keep the display loop unblocked.
 
 ## License
 

@@ -36,15 +36,20 @@ src/
   I2C_Driver.cpp                   I2C bus (SDA=15, SCL=7)
   TCA9554PWR.cpp                   TCA9554 GPIO expander at I2C 0x20
   Wireless.cpp                     WiFi and Bluetooth scan utilities
+  Clock.cpp                        NTP time sync, 24h clock display, hourly/half-hourly beeps
+  sample_image.c                   Background image (LVGL C array, 480×480, CF_TRUE_COLOR)
 include/
   Display_ST7701.h
   LVGL_Driver.h
   I2C_Driver.h
   TCA9554PWR.h
   Wireless.h                       WiFi/Bluetooth scan API
+  Clock.h                          Clock_Init() — call after Lvgl_Init()
   lv_conf.h                        LVGL compile-time configuration
   secrets.h.example                WiFi credentials template (copy to secrets.h)
   secrets.h                        WiFi credentials (gitignored — do not commit)
+  config.h.example                 User configuration template (copy to config.h)
+  config.h                         User configuration — timezone (gitignored — do not commit)
 ```
 
 ## Hardware Reference
@@ -104,10 +109,14 @@ After `Wifi_Connect()` establishes a WiFi association, it immediately performs a
 
 WiFi credentials go in `include/secrets.h` (gitignored — copy from `include/secrets.h.example`). When present, `main.cpp` picks them up via `#if defined(WIFI_SSID) && defined(WIFI_PASSWORD)` and calls `Wifi_Connect()` automatically.
 
+After WiFi connects, `Clock.cpp` starts NTP sync via `configTzTime()`. The timezone is configured in `include/config.h` (gitignored — copy from `include/config.h.example`) using a POSIX tz string (e.g. `"CET-1CEST,M3.5.0,M10.5.0/3"`). Without `config.h`, UTC is used as fallback.
+
 ## Conventions
 
 - Touch is stubbed — `LVGL_Driver` registers a dummy touchpad that always returns "released"
 - Backlight is controlled via `Set_Backlight(0–100)` (percentage)
 - Buzzer is controlled via `Set_EXIO(EXIO_PIN8, High/Low)` — active buzzer, fixed tone, on/off only
+- `Clock_Init(label)` starts the 1 s LVGL display timer and the NTP polling timer; call it after `Lvgl_Init()` and after creating the label widget
+- Buzzer beep sequences run as short-lived FreeRTOS tasks on core 0 (via `xTaskCreatePinnedToCore`) to avoid blocking the LVGL loop on core 1
 - Add new UI code in `setup()` after `Lvgl_Init()`, or factor it into a separate `.cpp` file
 - Keep frame buffer allocations in PSRAM (`MALLOC_CAP_SPIRAM`) to avoid exhausting internal SRAM
