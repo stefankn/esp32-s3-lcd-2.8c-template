@@ -125,6 +125,7 @@ After WiFi connects, `Clock.cpp` starts NTP sync via `configTzTime()`. The timez
 ## Conventions
 
 - Touch is handled by `src/Touch.cpp` — GT911 at I2C 0x5D, polled via `Lvgl_Touchpad_Read` every LVGL tick. Uses 16-bit register addresses over `Wire` directly (GT911 protocol is incompatible with `I2C_Read()`). Key protocol detail: the buffer-ready flag at 0x814E must be cleared after every read, including "finger lifted" events (status=0x80, count=0) — failing to clear on lift locks out all subsequent touches
+- Touch events (PRESSED, RELEASED, CLICKED, LONG_PRESSED) are LVGL-level concepts — handle them via `lv_obj_add_event_cb()` on the target object. LVGL routes events to the object under the finger, not the screen; events do not bubble up to parent objects unless `LV_OBJ_FLAG_EVENT_BUBBLE` is set on the child
 - Backlight is controlled via `Set_Backlight(0–100)` (percentage)
 - Buzzer is controlled via `Set_EXIO(EXIO_PIN8, High/Low)` — active buzzer, fixed tone, on/off only
 - `Clock_Init(parent, font, y)` creates the hour/colon/minute labels internally, starts the 1 s display timer and NTP polling timer; call it after `Lvgl_Init()`

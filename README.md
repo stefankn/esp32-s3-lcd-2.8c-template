@@ -235,9 +235,46 @@ LVGL fonts are pre-rendered C arrays. To add a custom font:
    lv_obj_set_style_text_font(label, &my_font_72, 0);
    ```
 
-## Notes
+## Touch
 
-- **Touch**: Not implemented. The touchpad driver is registered as a stub that always returns "released". Wire up your own touch IC driver if needed.
+The GT911 capacitive touch controller is polled by LVGL's input device system on every tick. `Touch_GetPoint()` reads the GT911 status register at `0x814E` and returns the first touch point when the buffer-ready flag is set.
+
+### Handling touch events in your UI
+
+LVGL fires touch events on the object the finger lands on — the screen itself, or any widget. To respond to taps on the background screen:
+
+```cpp
+static void my_touch_cb(lv_event_t *e) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_point_t p;
+    lv_indev_get_point(lv_indev_get_act(), &p);
+
+    if (code == LV_EVENT_CLICKED) {
+        // fired once per tap, on finger lift
+    } else if (code == LV_EVENT_LONG_PRESSED) {
+        // fired after ~400 ms hold
+    }
+}
+
+// In setup(), after Lvgl_Init():
+lv_obj_add_event_cb(lv_scr_act(), my_touch_cb, LV_EVENT_ALL, NULL);
+```
+
+Events fired by LVGL per tap:
+
+| Event | When |
+|---|---|
+| `LV_EVENT_PRESSED` | First contact |
+| `LV_EVENT_LONG_PRESSED` | Held ≥ 400 ms |
+| `LV_EVENT_RELEASED` | Finger lifted |
+| `LV_EVENT_CLICKED` | Released before long-press threshold |
+
+> **Caveat — event bubbling**: LVGL routes events to the object under the finger. If you add a button (`lv_btn_create`) over the screen, taps on the button go to the button and do **not** propagate to the screen's event callback. Add a separate callback to each widget, or set `LV_OBJ_FLAG_EVENT_BUBBLE` on the widget to forward events up to the parent:
+> ```cpp
+> lv_obj_add_flag(btn, LV_OBJ_FLAG_EVENT_BUBBLE);
+> ```
+
+## Notes
 - **Frame buffers**: Two full-screen LVGL draw buffers (480×480×2 bytes each) live in PSRAM. The RGB panel frame buffer is also in PSRAM.
 - **Display stability**: The flush callback uses a semaphore pair to wait for vsync before writing to the frame buffer. This prevents display shifting when WiFi is active. Pixel clock is 18 MHz rather than 30 MHz for the same reason. The bounce buffer is set to 20 × LCD_HEIGHT (19.2 KB) to reduce DMA interrupt frequency and minimise artifacts under WiFi load.
 - **Backlight**: Call `Set_Backlight(brightness)` with a value 0–100 at any time to adjust brightness.
