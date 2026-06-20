@@ -43,7 +43,7 @@ extern uint8_t LCD_Backlight;
 
 #define ESP_PANEL_LCD_WIDTH                       (480)
 #define ESP_PANEL_LCD_HEIGHT                      (480)
-#define ESP_PANEL_LCD_RGB_TIMING_FREQ_HZ          (30 * 1000 * 1000)
+#define ESP_PANEL_LCD_RGB_TIMING_FREQ_HZ          (18 * 1000 * 1000)
 #define ESP_PANEL_LCD_RGB_TIMING_HPW              (8)
 #define ESP_PANEL_LCD_RGB_TIMING_HBP              (10)
 #define ESP_PANEL_LCD_RGB_TIMING_HFP              (50)
@@ -90,7 +90,9 @@ extern uint8_t LCD_Backlight;
 #define ESP_PANEL_LCD_BK_LIGHT_OFF_LEVEL !ESP_PANEL_LCD_BK_LIGHT_ON_LEVEL
 
 
-extern esp_lcd_panel_handle_t panel_handle;   
+extern esp_lcd_panel_handle_t panel_handle;
+extern SemaphoreHandle_t sem_gui_ready;
+extern SemaphoreHandle_t sem_vsync_end;   
 bool example_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_panel_event_data_t *event_data, void *user_data);
 void ST7701_Init();
 
