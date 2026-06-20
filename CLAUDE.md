@@ -94,7 +94,9 @@ The order in `setup()` is critical — do not reorder:
 
 ## Wireless
 
-`Wifi_Scan()`, `Wifi_Connect(ssid, password)`, and `Bluetooth_Scan()` in `Wireless.cpp` each spawn an independent FreeRTOS task pinned to core 0. Call them after `setup()` completes — they return immediately and do not block the LVGL loop on core 1. Results are stored in `WIFI_NUM`, `BLE_NUM`, and `WIFI_Connection`.
+`Wifi_Scan()`, `Wifi_Connect(ssid, password)`, and `Bluetooth_Scan()` in `Wireless.cpp` each spawn an independent FreeRTOS task pinned to core 0. Call them after `setup()` completes — they return immediately and do not block the LVGL loop on core 1. Results are stored in `WIFI_NUM`, `BLE_NUM`, `WIFI_Connection`, and `INTERNET_Connection`.
+
+After `Wifi_Connect()` establishes a WiFi association, it immediately performs an internet reachability check by opening a TCP connection to `8.8.8.8:53` (Google DNS, 2-second timeout). The result is stored in `INTERNET_Connection` and logged as `Internet: reachable` / `Internet: unreachable`. This distinguishes a working internet path from merely joining a local network.
 
 WiFi credentials go in `include/secrets.h` (gitignored — copy from `include/secrets.h.example`). When present, `main.cpp` picks them up via `#if defined(WIFI_SSID) && defined(WIFI_PASSWORD)` and calls `Wifi_Connect()` automatically.
 

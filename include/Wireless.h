@@ -5,7 +5,8 @@ Each function spawns a background FreeRTOS task on core 0 and returns immediatel
 so the display and LVGL loop on core 1 are unaffected.
 
   Wifi_Scan()                   — scan for WiFi networks, log SSIDs/RSSI, store count in WIFI_NUM
-  Wifi_Connect(ssid, password)  — connect to a secured network; sets WIFI_Connection on success
+  Wifi_Connect(ssid, password)  — connect to a secured network; sets WIFI_Connection on success,
+                                  then checks internet reachability and sets INTERNET_Connection
   Bluetooth_Scan()              — run a 5-second BLE scan, log device count, store count in BLE_NUM
 */
 
@@ -13,6 +14,7 @@ so the display and LVGL loop on core 1 are unaffected.
 #include <stdint.h>
 
 extern bool     WIFI_Connection;
+extern bool     INTERNET_Connection;
 extern uint8_t  WIFI_NUM;
 extern uint8_t  BLE_NUM;
 

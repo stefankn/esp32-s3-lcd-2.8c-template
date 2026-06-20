@@ -4,9 +4,10 @@
 #include <BLEDevice.h>
 #include <BLEScan.h>
 
-bool    WIFI_Connection = false;
-uint8_t WIFI_NUM        = 0;
-uint8_t BLE_NUM         = 0;
+bool    WIFI_Connection     = false;
+bool    INTERNET_Connection = false;
+uint8_t WIFI_NUM            = 0;
+uint8_t BLE_NUM             = 0;
 
 struct WifiConnectParams {
   char ssid[64];
@@ -38,6 +39,11 @@ static void WifiConnectTask(void *parameter)
   if (WiFi.status() == WL_CONNECTED) {
     WIFI_Connection = true;
     Serial.printf("Connected — IP: %s\n", WiFi.localIP().toString().c_str());
+
+    WiFiClient client;
+    INTERNET_Connection = client.connect("8.8.8.8", 53, 2000);
+    client.stop();
+    Serial.printf("Internet: %s\n", INTERNET_Connection ? "reachable" : "unreachable");
   } else {
     WIFI_Connection = false;
     Serial.println("Connection failed (timeout)");

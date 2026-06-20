@@ -20,7 +20,7 @@ A starter template for the [Waveshare ESP32-S3-LCD-2.8C](https://www.waveshare.c
 - LVGL 8.3.9 integrated with dual PSRAM frame buffers, vsync-synchronised flush
 - Backlight PWM control (`Set_Backlight(0–100)`)
 - TCA9554 GPIO expander driver for display reset/CS/backlight enable
-- WiFi and Bluetooth scan utilities (`Wifi_Scan()` / `Bluetooth_Scan()`) — run as background FreeRTOS tasks on core 0
+- WiFi connect with internet reachability check (`Wifi_Connect()`) and scan utilities (`Wifi_Scan()` / `Bluetooth_Scan()`) — run as background FreeRTOS tasks on core 0
 - "Hello" label as a minimal working UI example
 
 ## Requirements
@@ -152,7 +152,8 @@ All three functions spawn a FreeRTOS task on core 0 and return immediately, so t
 
 // In setup(), after Lvgl_Init():
 Wifi_Scan();                          // logs SSIDs and RSSI, stores count in WIFI_NUM
-Wifi_Connect("ssid", "password");     // connects to a network; sets WIFI_Connection on success
+Wifi_Connect("ssid", "password");     // connects to a network; sets WIFI_Connection on success,
+                                      // then checks internet reachability and sets INTERNET_Connection
 Bluetooth_Scan();                     // 5-second BLE scan, stores count in BLE_NUM
 ```
 
