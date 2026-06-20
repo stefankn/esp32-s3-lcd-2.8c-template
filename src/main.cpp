@@ -47,6 +47,15 @@ void setup() {
   lv_obj_set_style_text_font(label, &lv_font_montserrat_48, 0);
   lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
 
+  // Startup beep (two short beeps)
+  Set_EXIO(EXIO_PIN8, High);
+  delay(100);
+  Set_EXIO(EXIO_PIN8, Low);
+  delay(100);
+  Set_EXIO(EXIO_PIN8, High);
+  delay(100);
+  Set_EXIO(EXIO_PIN8, Low);
+
   // Start WiFi and Bluetooth scans as independent background tasks on core 0
   //Wifi_Scan();
   //Bluetooth_Scan();
