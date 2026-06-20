@@ -8,6 +8,12 @@
 #include "config.h"
 #endif
 
+struct ClockLabels {
+  lv_obj_t *hours;
+  lv_obj_t *colon;
+  lv_obj_t *minutes;
+};
+
 static void beep_task(void *param) {
   int count = (int)param;
   for (int i = 0; i < count; i++) {
@@ -22,11 +28,20 @@ static void beep_task(void *param) {
 }
 
 static void time_timer_cb(lv_timer_t *timer) {
+  ClockLabels *labels = (ClockLabels *)timer->user_data;
   struct tm timeinfo;
   if (getLocalTime(&timeinfo)) {
-    char buf[6];
-    strftime(buf, sizeof(buf), "%H:%M", &timeinfo);
-    lv_label_set_text((lv_obj_t *)timer->user_data, buf);
+    char buf[3];
+
+    strftime(buf, sizeof(buf), "%H", &timeinfo);
+    lv_label_set_text(labels->hours, buf);
+
+    strftime(buf, sizeof(buf), "%M", &timeinfo);
+    lv_label_set_text(labels->minutes, buf);
+
+    // Blink the colon every second
+    lv_obj_set_style_text_opa(labels->colon,
+      (timeinfo.tm_sec % 2 == 0) ? LV_OPA_COVER : LV_OPA_TRANSP, 0);
 
     if (timeinfo.tm_sec == 0) {
       int beeps = 0;
@@ -52,7 +67,35 @@ static void ntp_start_cb(lv_timer_t *timer) {
   }
 }
 
-void Clock_Init(lv_obj_t *label) {
-  lv_timer_create(time_timer_cb, 1000, label);
+void Clock_Init(lv_obj_t *parent, const lv_font_t *font, lv_coord_t y) {
+  ClockLabels *labels = new ClockLabels();
+
+  auto make_label = [&](const char *text) {
+    lv_obj_t *lbl = lv_label_create(parent);
+    lv_label_set_text(lbl, text);
+    lv_obj_set_style_text_color(lbl, lv_color_white(), 0);
+    lv_obj_set_style_text_font(lbl, font, 0);
+    return lbl;
+  };
+
+  labels->hours   = make_label("--");
+  labels->colon   = make_label(":");
+  labels->minutes = make_label("--");
+
+  // Lay out hours, colon, minutes in a horizontal row centered at y
+  lv_obj_t *row = lv_obj_create(parent);
+  lv_obj_remove_style_all(row);
+  lv_obj_set_size(row, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+  lv_obj_set_layout(row, LV_LAYOUT_FLEX);
+  lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
+  lv_obj_set_flex_align(row, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+  lv_obj_align(row, LV_ALIGN_TOP_MID, 0, y);
+
+  // Re-parent labels into the row
+  lv_obj_set_parent(labels->hours,   row);
+  lv_obj_set_parent(labels->colon,   row);
+  lv_obj_set_parent(labels->minutes, row);
+
+  lv_timer_create(time_timer_cb, 1000, labels);
   lv_timer_create(ntp_start_cb, 500, NULL);
 }

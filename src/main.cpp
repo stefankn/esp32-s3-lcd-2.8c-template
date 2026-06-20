@@ -48,13 +48,7 @@ void setup() {
   lv_img_set_src(img, &cats);
   lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
 
-  // Create a simple label centered on top of the background
-  lv_obj_t *label = lv_label_create(lv_scr_act());
-  lv_label_set_text(label, "--:--");
-  lv_obj_set_style_text_color(label, lv_color_white(), 0);
-  lv_obj_set_style_text_font(label, &digital7_72, 0);
-  lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 75);
-  Clock_Init(label);
+  Clock_Init(lv_scr_act(), &digital7_72, 75);
 
   // Start WiFi and Bluetooth scans as independent background tasks on core 0
   // Wifi_Scan();
