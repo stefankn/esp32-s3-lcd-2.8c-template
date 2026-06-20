@@ -1,0 +1,12 @@
+// Copy this file to config.h and set your timezone.
+// config.h is gitignored and will not be committed.
+//
+// Use POSIX tz strings — they handle DST automatically:
+//   UTC:                       "UTC0"
+//   Central Europe (CET/CEST): "CET-1CEST,M3.5.0,M10.5.0/3"
+//   UK (GMT/BST):              "GMT0BST,M3.5.0/1,M10.5.0"
+//   US Eastern (EST/EDT):      "EST5EDT,M3.2.0,M11.1.0"
+//   US Pacific (PST/PDT):      "PST8PDT,M3.2.0,M11.1.0"
+//
+// Full list: https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv
+#define TIMEZONE "UTC0"

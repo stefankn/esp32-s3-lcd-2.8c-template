@@ -3,3 +3,4 @@ platformio.ini
 .pio/
 compile_commands.json
 include/secrets.h
+include/config.h

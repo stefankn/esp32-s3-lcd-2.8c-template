@@ -1,10 +1,13 @@
 #include "LVGL_Driver.h"
 #include "Wireless.h"
+#include "Clock.h"
 #include <Arduino.h>
 
 #if __has_include("secrets.h")
 #include "secrets.h"
 #endif
+
+LV_IMG_DECLARE(cats);
 
 void setup() {
   Serial.begin(115200);
@@ -40,25 +43,22 @@ void setup() {
   // Set background to black
   lv_obj_set_style_bg_color(lv_scr_act(), lv_color_black(), 0);
 
-  // Create a simple label
+  // Display image as full-screen background
+  lv_obj_t *img = lv_img_create(lv_scr_act());
+  lv_img_set_src(img, &cats);
+  lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
+
+  // Create a simple label centered on top of the background
   lv_obj_t *label = lv_label_create(lv_scr_act());
-  lv_label_set_text(label, "Hello");
+  lv_label_set_text(label, "--:--");
   lv_obj_set_style_text_color(label, lv_color_white(), 0);
   lv_obj_set_style_text_font(label, &lv_font_montserrat_48, 0);
-  lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
-
-  // Startup beep (two short beeps)
-  Set_EXIO(EXIO_PIN8, High);
-  delay(100);
-  Set_EXIO(EXIO_PIN8, Low);
-  delay(100);
-  Set_EXIO(EXIO_PIN8, High);
-  delay(100);
-  Set_EXIO(EXIO_PIN8, Low);
+  lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 75);
+  Clock_Init(label);
 
   // Start WiFi and Bluetooth scans as independent background tasks on core 0
-  //Wifi_Scan();
-  //Bluetooth_Scan();
+  // Wifi_Scan();
+  // Bluetooth_Scan();
 
 #if defined(WIFI_SSID) && defined(WIFI_PASSWORD)
   Wifi_Connect(WIFI_SSID, WIFI_PASSWORD);
